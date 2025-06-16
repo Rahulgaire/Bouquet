@@ -59,7 +59,7 @@ const Home = () => {
       <section className="bg-white py-16 px-4">
         <h2 className="text-3xl font-bold text-center mb-10">Happy Customers</h2>
         <div className="flex flex-col md:flex-row justify-center items-center gap-6 max-w-5xl mx-auto">
-          {[1, 2].map((item) => (
+          {[1, 2,3].map((item) => (
             <div key={item} className="bg-pink-100 p-6 rounded-lg shadow max-w-sm">
               <p className="italic">"Absolutely loved the bouquet! Arrived fresh and beautifully wrapped."</p>
               <div className="mt-4 font-semibold">– Customer {item}</div>
