@@ -27,6 +27,7 @@ const Login = () => {
         navigate('/dashboard/');
       } else {
         navigate('/');
+       window.location.reload();
       }
     } catch (err) {
       alert(err.response?.data?.message || 'Login failed. Please try again.');

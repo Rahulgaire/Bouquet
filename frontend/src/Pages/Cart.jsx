@@ -1,55 +1,75 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Cart = () => {
   const [cart, setCart] = useState(null);
-  const dummyUserId = "6660eaf52f5b7e3d1c5fbc33"; // 🔁 Replace with real userId
+  const navigate = useNavigate();
 
-  // Fetch Cart
+  const user = JSON.parse(localStorage.getItem('user'));
+  const userId = user?._id;
+
+  useEffect(() => {
+    if (!userId) {
+      alert("Please login to view your cart.");
+      navigate('/login');
+      return;
+    }
+
+    fetchCart();
+  }, [userId]);
+
   const fetchCart = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/order/${dummyUserId}`);
+      const res = await axios.get(`http://localhost:5000/order/${userId}`);
       setCart(res.data.cart);
+
+      // ✅ Save count to localStorage
+      const totalCount = res.data.cart.products.reduce((sum, item) => sum + item.quantity, 0);
+      localStorage.setItem("cartCount", totalCount.toString());
     } catch (err) {
       console.error("Error fetching cart:", err);
       alert("Could not load cart.");
     }
   };
 
-  useEffect(() => {
-    fetchCart();
-  }, []);
-
-  // Update Quantity
   const updateQuantity = async (productId, delta) => {
     try {
       await axios.post(`http://localhost:5000/order/add`, {
-        userId: dummyUserId,
+        userId,
         productId,
-        quantity: delta
+        quantity: delta,
       });
-      fetchCart(); // Refresh cart
+      fetchCart();
     } catch (err) {
       console.error("Error updating quantity:", err);
     }
   };
 
-  // Delete Product from Cart
   const deleteProduct = async (productId) => {
     try {
       await axios.post(`http://localhost:5000/order/remove`, {
-        userId: dummyUserId,
-        productId
+        userId,
+        productId,
       });
+      window.location.reload()
       fetchCart();
     } catch (err) {
       console.error("Error removing item:", err);
     }
   };
 
+  const getTotalPrice = () => {
+    if (!cart?.products) return 0;
+    return cart.products.reduce((total, item) => {
+      return total + item.productId.price * item.quantity;
+    }, 0);
+  };
+
   return (
     <section className="py-10 px-4 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
+
       {cart && cart.products.length > 0 ? (
         <>
           <ul className="space-y-4">
@@ -94,13 +114,19 @@ const Cart = () => {
           </ul>
 
           <div className="text-right mt-6">
-            <button className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
+            <p className="text-lg font-semibold mb-2">
+              Total: ₹{getTotalPrice()}
+            </p>
+            <button
+              className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+              onClick={() => navigate("/checkout")}
+            >
               Proceed to Checkout
             </button>
           </div>
         </>
       ) : (
-        <p>Your cart is empty.</p>
+        <p className="text-gray-600">Your cart is empty.</p>
       )}
     </section>
   );

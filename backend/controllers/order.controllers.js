@@ -79,5 +79,21 @@ const removeFromCart = async (req, res) => {
   }
 };
 
+// GET /order/count/:userId
+const getCartCount = async (req, res) => {
+  const { userId } = req.params;
 
-module.exports = { addToCart,getCart ,removeFromCart};
+  if (!userId) {
+    return res.status(400).json({ message: "userId is required" });
+  }
+
+  try {
+    const cart = await Cart.findOne({ userId });
+    const count = cart?.products?.length || 0;
+    res.status(200).json({ count });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch cart count", error: err.message });
+  }
+};
+
+module.exports = { addToCart,getCart ,removeFromCart , getCartCount};
