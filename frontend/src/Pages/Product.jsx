@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+import toast from "react-hot-toast";  
 const Product = () => {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const Product = () => {
         setProducts(res.data.data || []);
       } catch (err) {
         console.error("Failed to fetch products:", err);
-        alert("Could not load products.");
+        toast.error("Could not load products.");
       }
     };
 
@@ -25,7 +25,7 @@ const Product = () => {
 
   const addToCart = async (productId) => {
     if (!userId) {
-      alert("Please login to add to cart.");
+      toast("Please login to add to cart.");
       return navigate("/login");
     }
 
@@ -35,18 +35,18 @@ const Product = () => {
         productId,
         quantity: 1,
       });
-
-      alert("Product added to cart!");
       window.location.reload()
+   
+      toast.success("Product added to cart!");
     } catch (err) {
       console.error("Error adding to cart:", err);
-      alert("Failed to add to cart.");
+      toast.error("Failed to add to cart.");
     }
   };
 
   return (
     <section className="py-16 px-4 bg-white text-center">
-      <h2 className="text-3xl font-bold mb-6">Featured Bouquets</h2>
+      <h2 className="text-3xl font-bold mb-6">Our Bouquets </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
         {products.length > 0 ? (
           products.map((item) => (

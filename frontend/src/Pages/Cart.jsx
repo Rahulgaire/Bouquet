@@ -22,10 +22,15 @@ const Cart = () => {
   const fetchCart = async () => {
     try {
       const res = await axios.get(`http://localhost:5000/order/${userId}`);
-      setCart(res.data.cart);
+      
+      // Filter out items with missing productId
+      const validProducts = res.data.cart.products.filter(item => item.productId);
+      const updatedCart = { ...res.data.cart, products: validProducts };
 
-      // ✅ Save count to localStorage
-      const totalCount = res.data.cart.products.reduce((sum, item) => sum + item.quantity, 0);
+      setCart(updatedCart);
+
+      // Save total item count to localStorage
+      const totalCount = validProducts.reduce((sum, item) => sum + item.quantity, 0);
       localStorage.setItem("cartCount", totalCount.toString());
     } catch (err) {
       console.error("Error fetching cart:", err);
@@ -52,7 +57,6 @@ const Cart = () => {
         userId,
         productId,
       });
-      window.location.reload()
       fetchCart();
     } catch (err) {
       console.error("Error removing item:", err);
@@ -62,7 +66,7 @@ const Cart = () => {
   const getTotalPrice = () => {
     if (!cart?.products) return 0;
     return cart.products.reduce((total, item) => {
-      return total + item.productId.price * item.quantity;
+      return total + (item.productId?.price || 0) * item.quantity;
     }, 0);
   };
 
@@ -75,20 +79,20 @@ const Cart = () => {
           <ul className="space-y-4">
             {cart.products.map((item) => (
               <li
-                key={item.productId._id}
+                key={item.productId?._id || item._id}
                 className="flex items-center justify-between border p-4 rounded shadow-sm"
               >
                 <img
-                  src={item.productId.image || 'https://source.unsplash.com/100x100/?product'}
-                  alt={item.productId.name}
+                  src={item.productId?.image || 'https://source.unsplash.com/100x100/?product'}
+                  alt={item.productId?.name || 'Product'}
                   className="w-20 h-20 object-cover rounded"
                 />
                 <div className="flex-1 ml-4 text-left">
-                  <h3 className="font-semibold">{item.productId.name}</h3>
-                  <p className="text-sm text-gray-600">₹{item.productId.price}</p>
+                  <h3 className="font-semibold">{item.productId?.name || 'Unnamed Product'}</h3>
+                  <p className="text-sm text-gray-600">₹{item.productId?.price || 0}</p>
                   <div className="mt-2 flex items-center gap-2">
                     <button
-                      onClick={() => updateQuantity(item.productId._id, -1)}
+                      onClick={() => updateQuantity(item.productId?._id, -1)}
                       className="px-2 bg-gray-200 hover:bg-gray-300 rounded"
                       disabled={item.quantity <= 1}
                     >
@@ -96,7 +100,7 @@ const Cart = () => {
                     </button>
                     <span className="px-2">{item.quantity}</span>
                     <button
-                      onClick={() => updateQuantity(item.productId._id, 1)}
+                      onClick={() => updateQuantity(item.productId?._id, 1)}
                       className="px-2 bg-gray-200 hover:bg-gray-300 rounded"
                     >
                       +
@@ -104,7 +108,7 @@ const Cart = () => {
                   </div>
                 </div>
                 <button
-                  onClick={() => deleteProduct(item.productId._id)}
+                  onClick={() => deleteProduct(item.productId?._id)}
                   className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                 >
                   Delete

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaHeart, FaShoppingCart, FaBars, FaTimes } from 'react-icons/fa';
-import { CgProfile } from 'react-icons/cg';
+import { FaShoppingCart, FaBars, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 
 const Navbar = () => {
@@ -16,16 +15,16 @@ const Navbar = () => {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
 
-      // Fetch cart count
-      axios.get(`http://localhost:5000/order/count/${parsedUser._id}`, {
-        withCredentials: true,
-      })
-      .then(res => {
-        setCartCount(res.data.count || 0);
-      })
-      .catch(() => {
-        setCartCount(0);
-      });
+      axios
+        .get(`http://localhost:5000/order/count/${parsedUser._id}`, {
+          withCredentials: true,
+        })
+        .then((res) => {
+          setCartCount(res.data.count || 0);
+        })
+        .catch(() => {
+          setCartCount(0);
+        });
     }
   }, []);
 
@@ -45,8 +44,7 @@ const Navbar = () => {
   return (
     <header className="bg-white text-gray-800 shadow-md font-serif sticky top-0 z-50">
       <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
-
-        {/* Hamburger */}
+        {/* Hamburger for mobile */}
         <div className="md:hidden text-2xl" onClick={() => setIsSidebarOpen(true)}>
           <FaBars />
         </div>
@@ -66,18 +64,17 @@ const Navbar = () => {
 
         {/* Desktop Icons */}
         <div className="hidden md:flex items-center gap-4 text-xl relative">
-          <FaHeart className="hover:text-red-500 cursor-pointer" />
-          
+          {/* Cart */}
           <Link to='/cart' className="relative">
-            <FaShoppingCart className="hover:text-green-600 cursor-pointer" />
+            <FaShoppingCart className="hover:text-green-600 cursor-pointer text-xl" />
             {cartCount > 0 && (
-              <span className="absolute top-[-6px] right-[-6px] bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
                 {cartCount}
               </span>
             )}
           </Link>
 
-          <CgProfile className="hover:text-blue-600 cursor-pointer" />
+          {/* Auth Buttons */}
           {user ? (
             <button
               onClick={handleLogout}
@@ -110,20 +107,19 @@ const Navbar = () => {
           <li><Link to="/contact" onClick={() => setIsSidebarOpen(false)} className="block px-2 py-2 hover:bg-gray-100">Contact</Link></li>
         </ul>
 
-        {/* Sidebar Icons + Auth */}
+        {/* Sidebar Cart and Auth */}
         <div className="flex flex-col px-6 pt-6 gap-4 text-xl">
           <div className="flex gap-4 items-center">
-            <FaHeart className="text-red-500 cursor-pointer" />
             <Link to='/cart' className="relative">
-              <FaShoppingCart className="text-green-600 cursor-pointer" />
+              <FaShoppingCart className="text-green-600 cursor-pointer text-xl" />
               {cartCount > 0 && (
-                <span className="absolute top-[-6px] right-[-6px] bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
             </Link>
-            <CgProfile className="text-blue-600 cursor-pointer" />
           </div>
+
           {user ? (
             <button
               onClick={() => {

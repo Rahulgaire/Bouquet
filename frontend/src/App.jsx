@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -17,7 +17,7 @@ import Cart from './Pages/Cart';
 import Login from './Auth/Login';
 import Register from './Auth/Register';
 import Dashboard from './Dashboard/Dashboard';
-
+import CheckoutSuccess from './Pages/Checkout';
 // Sub-component (must be called AFTER BrowserRouter)
 const AppRoutes = () => {
   const location = useLocation();
@@ -26,6 +26,9 @@ const AppRoutes = () => {
     location.pathname.startsWith('/login') ||
     location.pathname.startsWith('/register') ||  location.pathname.startsWith('/cart')
 
+      useEffect(()=>{
+        window.scrollTo(0,0)
+      })
 
   return (
     <>
@@ -40,6 +43,7 @@ const AppRoutes = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/checkout" element={<CheckoutSuccess />} />
       </Routes>
 
       {!isDashboard && !isAuth && <Footer />}
