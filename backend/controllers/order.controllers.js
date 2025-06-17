@@ -4,14 +4,13 @@ const Product = require("../models/product.models");
 
 const addToCart = async (req, res) => {
   const { userId, productId, quantity } = req.body;
-
+  
   if (!userId || !productId) {
     return res.status(400).json({ message: "userId and productId are required" });
   }
-
   try {
     let cart = await Cart.findOne({ userId });
-
+      
     if (!cart) {
       // Create a new cart
       cart = new Cart({
@@ -26,6 +25,9 @@ const addToCart = async (req, res) => {
 
       if (productIndex > -1) {
         cart.products[productIndex].quantity += quantity || 1;
+        return res.status(400).json({
+          message:"Product Already Exists"
+        })
       } else {
         cart.products.push({ productId, quantity: quantity || 1 });
       }

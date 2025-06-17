@@ -36,6 +36,7 @@ const Navbar = () => {
       localStorage.removeItem('user');
       setUser(null);
       navigate("/login");
+      
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -128,7 +129,7 @@ const Navbar = () => {
               }}
               className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded text-sm"
             >
-              Logout
+              Logout 
             </button>
           ) : (
             <Link to="/login">
